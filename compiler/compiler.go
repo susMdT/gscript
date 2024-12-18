@@ -497,7 +497,7 @@ func (c *Compiler) PerformPostCompileObfuscation() error {
 // Janky workaround to make this work in newer versions of go
 func (c *Compiler) PrepBuildNativeBinary() error {
 	var cmd *exec.Cmd
-	cmd = exec.Command("go", "mod", "init")
+	cmd = exec.Command("go", "mod", "init", "main.go")
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	err := cmd.Run()
