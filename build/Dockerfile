@@ -1,4 +1,4 @@
-FROM golang:1.17.13-bullseye
+FROM golang:1.22.0-bullseye
 MAINTAINER Alex Levinson <alexl@uber.com>
 
 ENV GSCRIPT_REVISION master
@@ -13,7 +13,7 @@ RUN mkdir -p $GOROOT && \
     git clone https://github.com/robertkrimen/otto /usr/local/go/src/github.com/robertkrimen/otto && \
     git clone -b v1.0.5 https://github.com/go-sourcemap/sourcemap /usr/local/go/src/gopkg.in/sourcemap.v1 && \
     cd cmd/gscript && \
-    go install -i -a
+    go install -a
 
 WORKDIR /root
 

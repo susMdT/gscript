@@ -493,22 +493,36 @@ func (c *Compiler) PerformPostCompileObfuscation() error {
 	return nil
 }
 
+// PrepBuildNativeBinary gets the go modules ready in preparation for build
+// Janky workaround to make this work in newer versions of go
+func (c *Compiler) PrepBuildNativeBinary() error {
+	var cmd *exec.Cmd
+	cmd = exec.Command("go", "mod", "tidy", c.OutputFile, c.BuildArgs)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	err := cmd.Run()
+	return err
+}
 // BuildNativeBinary uses the golang compiler to attempt to build a native binary for
 // the target platform specified in the compiler options
 func (c *Compiler) BuildNativeBinary() error {
 	os.Chdir(c.BuildDir)
+	err := c.PrepBuildNativeBinary()
+	if err != nil {
+		return err
+	}
 	var cmd *exec.Cmd
 	if c.WindowsGui {
-		cmd = exec.Command("go", "build", `-ldflags`, `-H=windowsgui -s -w`, "-o", c.OutputFile, c.BuildArgs)
+		cmd = exec.Command("go", "build", `-ldflags`, `-H=windowsgui -s`, "-o", c.OutputFile, c.BuildArgs)
 	} else {
-		cmd = exec.Command("go", "build", `-ldflags`, `-s -w`, "-o", c.OutputFile, c.BuildArgs)
+		cmd = exec.Command("go", "build", `-ldflags`, `-s`, "-o", c.OutputFile, c.BuildArgs)
 	}
 	cmd.Env = os.Environ()
 	cmd.Env = append(cmd.Env, fmt.Sprintf("GOOS=%s", c.OS))
 	cmd.Env = append(cmd.Env, fmt.Sprintf("GOARCH=%s", c.Arch))
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
-	err := cmd.Run()
+	err = cmd.Run()
 	return err
 }
 
