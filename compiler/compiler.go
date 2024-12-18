@@ -504,11 +504,7 @@ func (c *Compiler) PrepBuildNativeBinary() error {
 	if err != nil {
 		return err
 	}
-	cmd = exec.Command("go", "mod", "tidy")
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	err = cmd.Run()
-
+	
 	cmd = exec.Command("go", "mod", "edit", "-require=github.com/robertkrimen/otto@v0.0.0-20191219234010-c382bd3c16ff")
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
