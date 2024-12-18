@@ -497,10 +497,17 @@ func (c *Compiler) PerformPostCompileObfuscation() error {
 // Janky workaround to make this work in newer versions of go
 func (c *Compiler) PrepBuildNativeBinary() error {
 	var cmd *exec.Cmd
-	cmd = exec.Command("go", "mod", "tidy", c.OutputFile, c.BuildArgs)
+	cmd = exec.Command("go", "mod", "init")
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	err := cmd.Run()
+	if err != nil {
+		return err
+	}
+	cmd = exec.Command("go", "mod", "tidy")
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	err = cmd.Run()
 	return err
 }
 // BuildNativeBinary uses the golang compiler to attempt to build a native binary for
