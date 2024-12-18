@@ -9,6 +9,9 @@ import (
 
 	"github.com/mitchellh/go-ps"
 	"golang.org/x/sys/windows/registry"
+
+	"fmt"
+	windows2 "golang.org/x/sys/windows"
 )
 
 const (
@@ -348,4 +351,28 @@ func InjectShellcode(pid_int int, payload []byte) error {
 
 	// all good!
 	return nil
+}
+
+func IsUserAdmin() (bool, error) {
+
+    // Get the current token
+    token, err := windows2.OpenCurrentProcessToken()
+    if err != nil {
+        return false, fmt.Errorf("failed to open process token: %v", err)
+    }
+    defer token.Close()
+
+    // Check if the user has the SeDebugPrivilege
+    var sid *windows2.SID
+    err = windows2.CreateWellKnownSid(windows2.WinBuiltinAdministratorsSid, nil, &sid)
+    if err != nil {
+        return false, fmt.Errorf("failed to create well-known SID: %v", err)
+    }
+
+    isMember, err := token.IsMember(sid)
+    if err != nil {
+        return false, fmt.Errorf("failed to check if user is a member of Administrators group: %v", err)
+    }
+
+    return isMember, nil
 }
