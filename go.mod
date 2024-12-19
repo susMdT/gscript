@@ -48,4 +48,4 @@ require (
 	gopkg.in/sourcemap.v1 v1.0.5 // indirect
 )
 
-go 1.13
+go 1.19
