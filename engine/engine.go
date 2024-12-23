@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"runtime"
 
-	"github.com/gen0cide/gscript/logger"
-	"github.com/gen0cide/gscript/logger/null"
 	"github.com/robertkrimen/otto"
 	"github.com/robertkrimen/otto/file"
 	"github.com/robertkrimen/otto/parser"
+	"github.com/susMdT/gscript/logger"
+	"github.com/susMdT/gscript/logger/null"
 )
 
 // Engine defines the virtual machine type for the genesis scripting engine
@@ -240,7 +240,7 @@ func (e *Engine) setGlobalRef() error {
 }
 
 // EnableAssets injects the core asset handling functions into the engine's runtime
-// TODO (gen0cide): Fix asset retrieval to call from vm functions, not the raw translations
+// TODO (susMdT): Fix asset retrieval to call from vm functions, not the raw translations
 func (e *Engine) EnableAssets() error {
 	err := e.VM.Set("GetAssetAsString", e.retrieveAssetAsString)
 	if err != nil {

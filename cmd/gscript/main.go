@@ -7,9 +7,9 @@ import (
 	"github.com/sirupsen/logrus"
 
 	"github.com/fatih/color"
-	"github.com/gen0cide/gscript"
-	"github.com/gen0cide/gscript/compiler/computil"
-	"github.com/gen0cide/gscript/logger/standard"
+	"github.com/susMdT/gscript"
+	"github.com/susMdT/gscript/compiler/computil"
+	"github.com/susMdT/gscript/logger/standard"
 	"github.com/urfave/cli/v2"
 )
 

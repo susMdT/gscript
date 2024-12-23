@@ -14,10 +14,10 @@ import (
 	"text/template"
 
 	"github.com/fatih/color"
-	"github.com/gen0cide/gscript/compiler/computil"
-	"github.com/gen0cide/gscript/logger"
 	gast "github.com/robertkrimen/otto/ast"
 	gfile "github.com/robertkrimen/otto/file"
+	"github.com/susMdT/gscript/compiler/computil"
+	"github.com/susMdT/gscript/logger"
 	"github.com/tdewolff/minify"
 	"github.com/tdewolff/minify/js"
 	"golang.org/x/tools/imports"
@@ -416,9 +416,9 @@ func (g *GenesisVM) WalkGoPackageAST(gop *GoPackage, wg *sync.WaitGroup, errChan
 		validSrcFiles[f] = true
 	}
 
-    for _, f := range pkg.CgoFiles {
-       validSrcFiles[f] = true
-    }
+	for _, f := range pkg.CgoFiles {
+		validSrcFiles[f] = true
+	}
 
 	pkgFilter := func(fi os.FileInfo) bool {
 		return validSrcFiles[fi.Name()]

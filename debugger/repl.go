@@ -8,10 +8,10 @@ import (
 	"path/filepath"
 
 	"github.com/fatih/color"
-	"github.com/gen0cide/gscript/logger/standard"
 	"github.com/gohxs/readline"
 	isatty "github.com/mattn/go-isatty"
 	"github.com/robertkrimen/otto"
+	"github.com/susMdT/gscript/logger/standard"
 )
 
 func (d *Debugger) runDebugger() error {

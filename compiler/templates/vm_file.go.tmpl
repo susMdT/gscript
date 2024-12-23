@@ -9,13 +9,13 @@ import (
   "fmt"
 	"io"
 
-  "github.com/gen0cide/gscript/engine"
+  "github.com/susMdT/gscript/engine"
   "github.com/robertkrimen/otto"
   {{ if $.HasDebuggingEnabled -}}
-    "github.com/gen0cide/gscript/debugger"
+    "github.com/susMdT/gscript/debugger"
   {{- end }}
   {{ if $.HasLoggingEnabled -}}
-    "github.com/gen0cide/gscript/logger/standard"
+    "github.com/susMdT/gscript/logger/standard"
   {{- end }}
 
   // Importing masks

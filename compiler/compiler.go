@@ -14,11 +14,11 @@ import (
 	"text/template"
 
 	"github.com/fatih/color"
-	"github.com/gen0cide/gscript/compiler/computil"
-	"github.com/gen0cide/gscript/compiler/obfuscator"
-	"github.com/gen0cide/gscript/logger"
-	"github.com/gen0cide/gscript/logger/null"
 	gparser "github.com/robertkrimen/otto/parser"
+	"github.com/susMdT/gscript/compiler/computil"
+	"github.com/susMdT/gscript/compiler/obfuscator"
+	"github.com/susMdT/gscript/logger"
+	"github.com/susMdT/gscript/logger/null"
 	"golang.org/x/tools/imports"
 )
 
@@ -504,18 +504,19 @@ func (c *Compiler) PrepBuildNativeBinary() error {
 	if err != nil {
 		return err
 	}
-	
+
 	cmd = exec.Command("go", "mod", "edit", "-require=github.com/robertkrimen/otto@v0.0.0-20191219234010-c382bd3c16ff")
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	err = cmd.Run()
 
-        cmd = exec.Command("go", "mod", "tidy")
+	cmd = exec.Command("go", "mod", "tidy")
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	err = cmd.Run()
 	return err
 }
+
 // BuildNativeBinary uses the golang compiler to attempt to build a native binary for
 // the target platform specified in the compiler options
 func (c *Compiler) BuildNativeBinary() error {

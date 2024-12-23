@@ -7,8 +7,8 @@ import (
 	"os/exec"
 	"path/filepath"
 
-	"github.com/gen0cide/gscript/compiler"
-	"github.com/gen0cide/gscript/compiler/computil"
+	"github.com/susMdT/gscript/compiler"
+	"github.com/susMdT/gscript/compiler/computil"
 	"github.com/urfave/cli/v2"
 )
 

@@ -6,7 +6,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/gen0cide/gscript/compiler/computil"
+	"github.com/susMdT/gscript/compiler/computil"
 )
 
 var (

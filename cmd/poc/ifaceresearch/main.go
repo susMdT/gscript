@@ -7,7 +7,7 @@ import (
 
 	"github.com/Jeffail/gabs/v2"
 
-	"github.com/gen0cide/gscript/compiler"
+	"github.com/susMdT/gscript/compiler"
 
 	"github.com/davecgh/go-spew/spew"
 	"github.com/robertkrimen/otto"

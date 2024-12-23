@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/fatih/color"
-	"github.com/gen0cide/gscript/compiler"
+	"github.com/susMdT/gscript/compiler"
 	"github.com/urfave/cli/v2"
 )
 

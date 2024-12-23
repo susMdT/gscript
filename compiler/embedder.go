@@ -12,7 +12,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/gen0cide/gscript/compiler/computil"
+	"github.com/susMdT/gscript/compiler/computil"
 )
 
 // EmbeddedFile is an object that manages the lifecycle of resolving and translating

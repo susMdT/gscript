@@ -13,7 +13,7 @@ import (
 	"sync"
 	"text/template"
 
-	"github.com/gen0cide/gscript/compiler/computil"
+	"github.com/susMdT/gscript/compiler/computil"
 	"golang.org/x/tools/imports"
 )
 

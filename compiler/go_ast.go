@@ -11,8 +11,8 @@ import (
 	"regexp"
 	"sync"
 
-	"github.com/gen0cide/gscript/compiler/computil"
-	"github.com/gen0cide/gscript/compiler/translator"
+	"github.com/susMdT/gscript/compiler/computil"
+	"github.com/susMdT/gscript/compiler/translator"
 )
 
 var (
@@ -39,24 +39,24 @@ var (
 		"uintptr":    true,
 	}
 
-	// TODO (gen0cide): fix this
+	// TODO (susMdT): fix this
 	invalidGoTypes = map[string]bool{
 		"complex128": true,
 		"complex64":  true,
 	}
 
 	binaryImports = map[string]string{
-		"bytes":           "bytes",
-		"compress/gzip":   "gzip",
-		"crypto/aes":      "aes",
-		"crypto/cipher":   "cipher",
-		"encoding/base64": "base64",
-		"fmt":             "fmt",
-		"io":              "io",
-		"github.com/gen0cide/gscript/engine":          "engine",
-		"github.com/robertkrimen/otto":                "otto",
-		"github.com/gen0cide/gscript/debugger":        "debugger",
-		"github.com/gen0cide/gscript/logger/standard": "standard",
+		"bytes":                              "bytes",
+		"compress/gzip":                      "gzip",
+		"crypto/aes":                         "aes",
+		"crypto/cipher":                      "cipher",
+		"encoding/base64":                    "base64",
+		"fmt":                                "fmt",
+		"io":                                 "io",
+		"github.com/susMdT/gscript/engine":   "engine",
+		"github.com/robertkrimen/otto":       "otto",
+		"github.com/susMdT/gscript/debugger": "debugger",
+		"github.com/susMdT/gscript/logger/standard": "standard",
 	}
 
 	funcRegexp  = regexp.MustCompile(`^func\({1}(?P<args>.*?)?\){1}\s*\(?(?P<rets>.*?)\)??$`)
