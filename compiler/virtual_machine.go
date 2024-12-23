@@ -411,14 +411,14 @@ func (g *GenesisVM) WalkGoPackageAST(gop *GoPackage, wg *sync.WaitGroup, errChan
 	// Hacky fix for resolving packages
 	g.Logger.Debugf("WalkGoPackageAST for %+v", gop)
 	_tmp := ""
-	if gop.ImportKey == "github.com/gen0cide/gscript/x/windows" {
+	if gop.ImportKey == "github.com/susMdT/gscript/x/windows" {
 		_tmp = gop.Dir
-		gop.ImportKey = "./github.com/gen0cide/gscript/x/windows"
+		gop.ImportKey = "./github.com/susMdT/gscript/x/windows"
 		gop.Dir = "/go/src"
 	}
-	if gop.ImportKey == "github.com/gen0cide/gscript/stdlib/file" {
+	if gop.ImportKey == "github.com/susMdT/gscript/stdlib/file" {
 		_tmp = gop.Dir
-		gop.ImportKey = "./github.com/gen0cide/gscript/stdlib/file"
+		gop.ImportKey = "./github.com/susMdT/gscript/stdlib/file"
 		gop.Dir = "/go/src"
 	}
 	g.Logger.Debugf("Calling ctxt.Import(%s, %s, %d)", gop.ImportKey, gop.Dir, build.ImportComment)

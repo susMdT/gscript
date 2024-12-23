@@ -1,3 +1,4 @@
+//go:build windows
 // +build windows
 
 package windows
@@ -11,6 +12,7 @@ import (
 	"golang.org/x/sys/windows/registry"
 
 	"fmt"
+
 	windows2 "golang.org/x/sys/windows"
 )
 
@@ -47,7 +49,7 @@ type RegistryRetValue struct {
 }
 
 /*
-	registry helper funcs
+registry helper funcs
 */
 func lookUpKey(keyString string) (registry.Key, error) {
 	key, ok := regKeys[keyString]
@@ -75,7 +77,7 @@ func AddRegKeyString(registryString string, path string, name string, value stri
 	return openRegKey.SetStringValue(name, value)
 }
 
-//AddRegKeyExpandedString Adds a registry key of type "expanded string".
+// AddRegKeyExpandedString Adds a registry key of type "expanded string".
 func AddRegKeyExpandedString(registryString string, path string, name string, value string) error {
 	regKey, err := lookUpKey(registryString)
 	if err != nil {
@@ -89,7 +91,7 @@ func AddRegKeyExpandedString(registryString string, path string, name string, va
 	return openRegKey.SetExpandStringValue(name, value)
 }
 
-//AddRegKeyBinary Adds a registry key of type "binary".
+// AddRegKeyBinary Adds a registry key of type "binary".
 func AddRegKeyBinary(registryString string, path string, name string, value []byte) error {
 	regKey, err := lookUpKey(registryString)
 	if err != nil {
@@ -103,7 +105,7 @@ func AddRegKeyBinary(registryString string, path string, name string, value []by
 	return openRegKey.SetBinaryValue(name, value)
 }
 
-//AddRegKeyDWORD Adds a registry key of type DWORD.
+// AddRegKeyDWORD Adds a registry key of type DWORD.
 func AddRegKeyDWORD(registryString string, path string, name string, value int64) error {
 	var uval uint32
 	uval = uint32(value)
@@ -119,7 +121,7 @@ func AddRegKeyDWORD(registryString string, path string, name string, value int64
 	return openRegKey.SetDWordValue(name, uval)
 }
 
-//AddRegKeyQWORD Adds a registry key of type QDWORD.
+// AddRegKeyQWORD Adds a registry key of type QDWORD.
 func AddRegKeyQWORD(registryString string, path string, name string, value int64) error {
 	var uval uint64
 	uval = uint64(value)
@@ -135,7 +137,7 @@ func AddRegKeyQWORD(registryString string, path string, name string, value int64
 	return openRegKey.SetQWordValue(name, uval)
 }
 
-//AddRegKeyStrings Adds a registry key of type "strings".
+// AddRegKeyStrings Adds a registry key of type "strings".
 func AddRegKeyStrings(registryString string, path string, name string, value []string) error {
 	regKey, err := lookUpKey(registryString)
 	if err != nil {
@@ -149,7 +151,7 @@ func AddRegKeyStrings(registryString string, path string, name string, value []s
 	return openRegKey.SetStringsValue(name, value)
 }
 
-//DelRegKey Removes a key from the registry.
+// DelRegKey Removes a key from the registry.
 func DelRegKey(registryString string, path string) error {
 	regKey, err := lookUpKey(registryString)
 	if err != nil {
@@ -158,16 +160,16 @@ func DelRegKey(registryString string, path string) error {
 	return registry.DeleteKey(regKey, path)
 }
 
-//DelRegKeyValue Removes the value of a key from the registry.
+// DelRegKeyValue Removes the value of a key from the registry.
 func DelRegKeyValue(registryString string, path string, valueName string) error {
 	regKey, err := lookUpKey(registryString)
 	if err != nil {
 		return err
 	}
-    openRegKey, _, err := registry.CreateKey(regKey, path, registry.SET_VALUE)
+	openRegKey, _, err := registry.CreateKey(regKey, path, registry.SET_VALUE)
 	openRegKey.DeleteValue(valueName)
-    openRegKey.Close()
-    return nil
+	openRegKey.Close()
+	return nil
 }
 
 // QueryRegKey Retrives a registry key's value.
@@ -225,7 +227,7 @@ func QueryRegKey(registryString string, path string, key string) (RegistryRetVal
 	return retVal, nil
 }
 
-//FindPid returns the PID of a running proccess as an int.
+// FindPid returns the PID of a running proccess as an int.
 func FindPid(procName string) (int, error) {
 	procs, err := ps.Processes()
 	if err != nil {
@@ -239,31 +241,29 @@ func FindPid(procName string) (int, error) {
 	return 0, errors.New(procName + " PID not found!")
 }
 
-
-//GetRunningCount returns the number of copies of a process running as an int.
+// GetRunningCount returns the number of copies of a process running as an int.
 func GetRunningCount(procName string) (int, error) {
-    procs, err := ps.Processes()
-    if err != nil {
-        return 0, err
-    }
-    var procCount = 0
-    for _, proc := range procs {
-        if proc.Executable() == procName {
-            procCount += 1
-        }
-    }
-    if procCount == 0 {
-        return 0, errors.New(procName + " is not running!")
-    } else {
-        return procCount, nil
-    }
+	procs, err := ps.Processes()
+	if err != nil {
+		return 0, err
+	}
+	var procCount = 0
+	for _, proc := range procs {
+		if proc.Executable() == procName {
+			procCount += 1
+		}
+	}
+	if procCount == 0 {
+		return 0, errors.New(procName + " is not running!")
+	} else {
+		return procCount, nil
+	}
 }
 
-
-//InjectShellcode Injects shellcode into a running process.
+// InjectShellcode Injects shellcode into a running process.
 func InjectShellcode(pid_int int, payload []byte) error {
 
-    pid := float64(pid_int);
+	pid := float64(pid_int)
 
 	// custom functions
 	checkErr := func(err error) bool {
@@ -355,24 +355,24 @@ func InjectShellcode(pid_int int, payload []byte) error {
 
 func IsUserAdmin() (bool, error) {
 
-    // Get the current token
-    token, err := windows2.OpenCurrentProcessToken()
-    if err != nil {
-        return false, fmt.Errorf("failed to open process token: %v", err)
-    }
-    defer token.Close()
+	// Get the current token
+	token, err := windows2.OpenCurrentProcessToken()
+	if err != nil {
+		return false, fmt.Errorf("failed to open process token: %v", err)
+	}
+	defer token.Close()
 
-    // Check if the user has the SeDebugPrivilege
-    var sid *windows2.SID
-    err = windows2.CreateWellKnownSid(windows2.WinBuiltinAdministratorsSid, nil, &sid)
-    if err != nil {
-        return false, fmt.Errorf("failed to create well-known SID: %v", err)
-    }
+	// Check if the user has the SeDebugPrivilege
+	var sid *windows2.SID
+	sid, err = windows2.CreateWellKnownSid(windows2.WinBuiltinAdministratorsSid)
+	if err != nil {
+		return false, fmt.Errorf("failed to create well-known SID: %v", err)
+	}
 
-    isMember, err := token.IsMember(sid)
-    if err != nil {
-        return false, fmt.Errorf("failed to check if user is a member of Administrators group: %v", err)
-    }
+	isMember, err := token.IsMember(sid)
+	if err != nil {
+		return false, fmt.Errorf("failed to check if user is a member of Administrators group: %v", err)
+	}
 
-    return isMember, nil
+	return isMember, nil
 }
