@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/fatih/color"
-	"github.com/gen0cide/gscript"
+	"github.com/susMdT/gscript"
 )
 
 // PrintLogo prints the genesis logo to the current standard out

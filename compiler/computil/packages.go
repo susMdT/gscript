@@ -13,8 +13,8 @@ import (
 )
 
 var (
-	baseImportPath = `github.com/gen0cide/gscript`
-	baseRegexpStr  = `github\.com/gen0cide/gscript`
+	baseImportPath = `github.com/susMdT/gscript`
+	baseRegexpStr  = `github\.com/susMdT/gscript`
 	baseRegexp     = regexp.MustCompile(baseRegexpStr)
 	testFileRegexp = regexp.MustCompile(`.*_test\.go$`)
 	windowsFix     = regexp.MustCompile(`\\`)

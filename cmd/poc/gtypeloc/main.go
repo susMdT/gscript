@@ -9,16 +9,16 @@ import (
 	"os"
 	"sync"
 
+	"github.com/ahhh/gopkgs"
 	"github.com/davecgh/go-spew/spew"
 	"github.com/gen0cide/waiter"
-	"github.com/ahhh/gopkgs"
 
-	"github.com/gen0cide/gscript/compiler"
+	"github.com/susMdT/gscript/compiler"
 
 	"github.com/sirupsen/logrus"
-	"github.com/x-cray/logrus-prefixed-formatter"
+	prefixed "github.com/x-cray/logrus-prefixed-formatter"
 
-	"github.com/gen0cide/gscript/compiler/computil"
+	"github.com/susMdT/gscript/compiler/computil"
 )
 
 // GoPirate defines a type searching a given go package for type declarations
