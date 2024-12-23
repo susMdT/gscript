@@ -1,7 +1,6 @@
 package computil
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -103,9 +102,7 @@ type Options struct {
 	// DEFAULT: false
 	EnableTestBuild bool `json:"enable_test_build,omitempty"`
 
-	// Used to describe the genesis dir on this machine
-	// DEFAULT: Discovered through GOPATH
-	GenesisDir string `json:"genesis_dir"`
+	ImportPath string `json:import_path,omitempty"`
 }
 
 // ValidOSList returns the list of valid target operating systems
@@ -159,10 +156,10 @@ func (o Options) CheckForConfigErrors() error {
 func DefaultOptions() Options {
 	currentOS := runtime.GOOS
 	currentArch := runtime.GOARCH
-	rootDir, err := ResolveGenesisPackageDir()
-	if err != nil {
-		panic(errors.New("could not find the genesis package in your go path"))
-	}
+	// rootDir, err := ResolveGenesisPackageDir()
+	// if err != nil {
+	// 	panic(errors.New("could not find the genesis package in your go path"))
+	// }
 	ext := "bin"
 	if currentOS == "windows" {
 		ext = "exe"
@@ -186,7 +183,7 @@ func DefaultOptions() Options {
 		ImportAllNativeFuncs:  false,
 		ForceUseMordorifier:   false,
 		ObfuscationLevel:      FullObfuscation,
-		GenesisDir:            rootDir,
+		ImportPath:            "",
 	}
 }
 

@@ -9,7 +9,6 @@ import (
 	"os"
 	"sync"
 
-	"github.com/ahhh/gopkgs"
 	"github.com/davecgh/go-spew/spew"
 	"github.com/gen0cide/waiter"
 
@@ -25,7 +24,7 @@ import (
 type GoPirate struct {
 	sync.RWMutex
 	Dir         string
-	Pkg         *gopkgs.Pkg
+	Pkg         *computil.Pkg
 	FilesByName map[string]*GoFile
 	AST         *ast.Package
 	Waiter      *waiter.Waiter

@@ -6,6 +6,7 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/susMdT/gscript/compiler"
+	"github.com/susMdT/gscript/compiler/computil"
 	"github.com/urfave/cli/v2"
 )
 
@@ -98,6 +99,11 @@ var (
 				Usage:       "override the default obfuscation level, where argument can be 0-4 with 0 being full and 4 being none",
 				Destination: &defaultCompileOptions.ObfuscationLevel,
 			},
+			&cli.StringFlag{
+				Name:        "import-path",
+				Usage:       "Import path with the gscript stdlib. Basically, a dir in ~/go or $GOPATH where the repo is. eg: gen0cide/gscript/",
+				Destination: &defaultCompileOptions.ImportPath,
+			},
 		},
 		Action: compileScriptCommand,
 	}
@@ -165,6 +171,7 @@ func compileScriptCommand(c *cli.Context) error {
 	cliLogger.Infof(copt("Import All Native Funcs", defaultCompileOptions.ImportAllNativeFuncs))
 	cliLogger.Infof(copt("Skip Compilation", defaultCompileOptions.SkipCompilation))
 	cliLogger.Infof(copt("Obfuscation Level", defaultCompileOptions.ObfuscationLevel))
+	cliLogger.Infof(copt("Import Path", defaultCompileOptions.ImportPath))
 	cliLogger.Info("")
 	cliLogger.Info(color.HiRedString("***  SOURCE SCRIPTS  ***"))
 	cliLogger.Info("")
@@ -182,6 +189,7 @@ func compileScriptCommand(c *cli.Context) error {
 			cliLogger.Errorf("Error adding script %s: %v", a, addErr)
 		}
 	}
+	computil.SetImportPath(defaultCompileOptions.ImportPath)
 	err := gc.Do()
 	if err != nil {
 		cliLogger.Errorf("Build Dir Located At: %s", gc.BuildDir)

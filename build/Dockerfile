@@ -1,4 +1,4 @@
-FROM golang:1.19.0-bullseye
+FROM golang:1.23.0-bullseye
 MAINTAINER Alex Levinson <alexl@uber.com>
 
 ENV GSCRIPT_REVISION master

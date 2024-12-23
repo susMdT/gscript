@@ -3,18 +3,18 @@ package computil
 import (
 	"errors"
 	"fmt"
+	"go/build"
 	"os"
 	"os/user"
 	"path/filepath"
 	"regexp"
 	"runtime"
-
-	"github.com/ahhh/gopkgs"
+	"strings"
 )
 
 var (
-	baseImportPath = `github.com/susMdT/gscript`
-	baseRegexpStr  = `github\.com/susMdT/gscript`
+	baseImportPath = ``
+	baseRegexpStr  = ``
 	baseRegexp     = regexp.MustCompile(baseRegexpStr)
 	testFileRegexp = regexp.MustCompile(`.*_test\.go$`)
 	windowsFix     = regexp.MustCompile(`\\`)
@@ -43,15 +43,75 @@ func regexpForModule(mod ...string) *regexp.Regexp {
 	return regexp.MustCompile(filepath.Join(append([]string{baseRegexpStr}, mod...)...))
 }
 
+// List packages on workDir.
+// workDir is required for module mode. If the workDir is not under module, then it will fallback to GOPATH mode.
+func list(opts PkgOptions) (map[string]Pkg, error) {
+	pkgs := make(map[string]Pkg)
+
+	if opts.WorkDir == "" {
+		// force on GOPATH mode
+		// fmt.Println("FORCING GOPATH MODE")
+		for _, srcDir := range build.Default.SrcDirs() {
+			// fmt.Printf("SOURCE DIR: %v\n", srcDir)
+			err := collectPkgs(srcDir, opts.WorkDir, opts.NoVendor, pkgs)
+			if err != nil {
+				return nil, err
+			}
+		}
+		return pkgs, nil
+	}
+
+	mods, err := listMods(opts.WorkDir)
+	if err != nil {
+		// GOPATH mode
+		for _, srcDir := range build.Default.SrcDirs() {
+			err = collectPkgs(srcDir, opts.WorkDir, opts.NoVendor, pkgs)
+			if err != nil {
+				return nil, err
+			}
+		}
+		return pkgs, nil
+	}
+
+	// Module mode
+	if err = collectPkgs(filepath.Join(build.Default.GOROOT, "src"), opts.WorkDir, false, pkgs); err != nil {
+		return nil, err
+	}
+
+	for _, m := range mods {
+		err = collectModPkgs(m, pkgs)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return pkgs, nil
+}
+
+func SetImportPath(path string) {
+	baseImportPath = path
+	var specialChars = []string{".", "\\", "+", "*", "?", "|", "{", "}", "(", ")", "[", "]", "^", "$"}
+	for _, char := range specialChars {
+		path = strings.ReplaceAll(path, char, "\\"+char)
+	}
+	baseRegexpStr = path
+}
+
 // GatherInstalledGoPackages retrieves a list of all installed go packages in the context of current GOPATH and GOROOT
-func GatherInstalledGoPackages() map[string]gopkgs.Pkg {
-	goPackages, err := gopkgs.Packages(gopkgs.Options{NoVendor: true})
+func GatherInstalledGoPackages() map[string]Pkg {
+	goPackages, err := List(PkgOptions{NoVendor: true})
 	if err != nil {
 		panic(err)
 	}
+	for p, _ := range goPackages {
+		if !strings.Contains(p, "/usr/lib/go-1.23/") {
+			fmt.Printf(p + "\n")
+			fmt.Printf(goPackages[p].ImportPath + "\n")
+		}
+	}
 	if runtime.GOOS == "windows" {
 		pathFix := regexp.MustCompile(`\\`)
-		newMap := map[string]gopkgs.Pkg{}
+		newMap := map[string]Pkg{}
 		for n, p := range goPackages {
 			newMap[pathFix.ReplaceAllString(n, `/`)] = p
 		}
@@ -79,24 +139,6 @@ func ResolveGoPath() string {
 	return filepath.Join(u.HomeDir, "go")
 }
 
-// ResolveGenesisPackageDir attempts to resolve the base directory for the genesis package
-func ResolveGenesisPackageDir() (targetDir string, err error) {
-	guess := filepath.Join(ResolveGoPath(), baseImportPath)
-	if _, ok := os.Stat(guess); ok == nil {
-		return guess, nil
-	}
-	for name, pkg := range InstalledGoPackages {
-		if !baseRegexp.MatchString(name) {
-			continue
-		}
-		targetDir = pkg.Dir
-	}
-	if targetDir == "" {
-		return targetDir, errors.New("could not locate the base genesis package")
-	}
-	return targetDir, nil
-}
-
 // ResolveEngineDir attempts to resolve the absolute path of the genesis engine directory
 func ResolveEngineDir() (targetDir string, err error) {
 	dirMatch := regexpForModule("engine")
@@ -113,7 +155,7 @@ func ResolveEngineDir() (targetDir string, err error) {
 }
 
 // ResolveStandardLibraryDir attempts to resolve the absolute path of the specified standard library package
-func ResolveStandardLibraryDir(pkg string) (*gopkgs.Pkg, error) {
+func ResolveStandardLibraryDir(pkg string) (*Pkg, error) {
 	dirMatch := regexpForModule("stdlib", pkg)
 	for name, gpkg := range InstalledGoPackages {
 		if !dirMatch.MatchString(name) {
@@ -124,7 +166,7 @@ func ResolveStandardLibraryDir(pkg string) (*gopkgs.Pkg, error) {
 	return nil, fmt.Errorf("could not locate standard library package %s", pkg)
 }
 
-func ResolveGlobalImport(pkg string) (*gopkgs.Pkg, error) {
+func ResolveGlobalImport(pkg string) (*Pkg, error) {
 	for _, gpkg := range InstalledGoPackages {
 		if gpkg.ImportPath == pkg {
 			return &gpkg, nil

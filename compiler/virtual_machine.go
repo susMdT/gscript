@@ -10,6 +10,7 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"sync"
 	"text/template"
 
@@ -363,12 +364,10 @@ func (g *GenesisVM) InitializeGoImports() error {
 func (g *GenesisVM) LocateGoPackages() error {
 	for _, gpkg := range computil.InstalledGoPackages {
 		if gop, ok := g.GoPackageByImport[gpkg.ImportPath]; ok {
-			g.Logger.Debugf("LocateGoPackages[1]: Located package for: %s\n", gpkg.Dir)
+			g.Logger.Debugf("LocateGoPackages[1]: Located package for: %s", gpkg.Dir)
 			gop.Dir = gpkg.Dir
 			gop.ImportPath = gpkg.ImportPath
 			gop.Name = gpkg.Name
-		} else {
-			// g.Logger.Errorf("LocateGoPackages[2]: Could not locate package for: %s\n", gpkg.Dir)
 		}
 	}
 	return nil
@@ -408,23 +407,20 @@ func (g *GenesisVM) WalkGoPackageAST(gop *GoPackage, wg *sync.WaitGroup, errChan
 	ctxt.GOOS = g.OS
 	ctxt.GOARCH = g.Arch
 
-	// Hacky fix for resolving packages
-	g.Logger.Debugf("WalkGoPackageAST for %+v", gop)
-	_tmp := ""
-	if gop.ImportKey == "github.com/susMdT/gscript/x/windows" {
-		_tmp = gop.Dir
-		gop.ImportKey = "./github.com/susMdT/gscript/x/windows"
-		gop.Dir = "/go/src"
-	}
-	if gop.ImportKey == "github.com/susMdT/gscript/stdlib/file" {
-		_tmp = gop.Dir
-		gop.ImportKey = "./github.com/susMdT/gscript/stdlib/file"
-		gop.Dir = "/go/src"
-	}
-	g.Logger.Debugf("Calling ctxt.Import(%s, %s, %d)", gop.ImportKey, gop.Dir, build.ImportComment)
-	pkg, err := ctxt.Import(gop.ImportKey, gop.Dir, build.ImportComment)
+	_imp := gop.ImportKey
+	_dir := gop.Dir
+	home, err := os.UserHomeDir()
 	if err != nil {
-		g.Logger.Errorf("Error when we called ctxt.Import(%s, %s, %d)", gop.ImportKey, gop.Dir, build.ImportComment)
+		// wtf
+	}
+	if strings.HasPrefix(gop.Dir, home+"/go/src/") {
+		_imp = "./" + _imp
+		_dir = home + "/go/src/"
+	}
+	g.Logger.Debugf("Calling ctxt.Import(%s, %s, %d)", _imp, _dir, build.ImportComment)
+	pkg, err := ctxt.Import(_imp, _dir, build.ImportComment)
+	if err != nil {
+		g.Logger.Errorf("Error when we called ctxt.Import(%s, %s, %d)", _imp, _dir, build.ImportComment)
 		g.Logger.Errorf("Error from WalkGoPackageAST[1]: %s", err.Error())
 		errChan <- err
 		wg.Done()
@@ -437,12 +433,7 @@ func (g *GenesisVM) WalkGoPackageAST(gop *GoPackage, wg *sync.WaitGroup, errChan
 			pkg.SrcRoot: %s
 			pkg.PkgRoot: %s
 			pkg.ImportPath: %s`,
-			gop.ImportKey, gop.Dir, build.ImportComment, pkg.Name, pkg.Dir, pkg.ImportComment, pkg.SrcRoot, pkg.PkgRoot, pkg.ImportPath)
-	}
-
-	// Restore so work
-	if _tmp != "" {
-		gop.Dir = _tmp
+			_imp, _dir, build.ImportComment, pkg.Name, pkg.Dir, pkg.ImportComment, pkg.SrcRoot, pkg.PkgRoot, pkg.ImportPath)
 	}
 
 	// NOTE: maybe we want to include pkg.CgoFiles?
