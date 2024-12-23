@@ -103,12 +103,6 @@ func GatherInstalledGoPackages() map[string]Pkg {
 	if err != nil {
 		panic(err)
 	}
-	for p, _ := range goPackages {
-		if !strings.Contains(p, "/usr/lib/go-1.23/") {
-			fmt.Printf(p + "\n")
-			fmt.Printf(goPackages[p].ImportPath + "\n")
-		}
-	}
 	if runtime.GOOS == "windows" {
 		pathFix := regexp.MustCompile(`\\`)
 		newMap := map[string]Pkg{}

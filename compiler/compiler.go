@@ -524,13 +524,22 @@ func (c *Compiler) BuildNativeBinary() error {
 	var cmd *exec.Cmd
 	if c.WindowsGui {
 		if c.EnableGarble {
-			cmd = exec.Command("garble", c.BuildArgs, "build", `-buildvcs=false`, `-ldflags`, `-s -w`, "-o", c.OutputFile)
+			if len(c.BuildArgs) == 0 {
+				cmd = exec.Command("garble", "build", `-buildvcs=false`, `-ldflags`, `-s -w`, "-o", c.OutputFile)
+			} else {
+				cmd = exec.Command("garble", c.BuildArgs, "build", `-buildvcs=false`, `-ldflags`, `-s -w`, "-o", c.OutputFile)
+			}
 		} else {
 			cmd = exec.Command("go", "build", `-ldflags`, `-H=windowsgui -s`, "-o", c.OutputFile, c.BuildArgs)
 		}
 	} else {
 		if c.EnableGarble {
-			cmd = exec.Command("garble", c.BuildArgs, "build", `-buildvcs=false`, `-ldflags`, `-s -w`, "-o", c.OutputFile)
+			if len(c.BuildArgs) == 0 {
+				cmd = exec.Command("garble", "build", `-buildvcs=false`, `-ldflags`, `-s -w`, "-o", c.OutputFile)
+
+			} else {
+				cmd = exec.Command("garble", c.BuildArgs, "build", `-buildvcs=false`, `-ldflags`, `-s -w`, "-o", c.OutputFile)
+			}
 		} else {
 			cmd = exec.Command("go", "build", `-ldflags`, `-s`, "-o", c.OutputFile, c.BuildArgs)
 		}
