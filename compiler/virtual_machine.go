@@ -330,6 +330,7 @@ func (g *GenesisVM) InitializeGoImports() error {
 		if m.Key != "go_import" {
 			continue
 		}
+		g.Logger.Debugf("InitializeGoImports[1] m: %+v", m)
 		gop := NewGoPackage(g, m.Params["namespace"], m.Params["gopkg"], false)
 		g.GoPackageByImport[m.Params["gopkg"]] = gop
 		g.GoPackageByNamespace[m.Params["namespace"]] = gop
@@ -362,9 +363,12 @@ func (g *GenesisVM) InitializeGoImports() error {
 func (g *GenesisVM) LocateGoPackages() error {
 	for _, gpkg := range computil.InstalledGoPackages {
 		if gop, ok := g.GoPackageByImport[gpkg.ImportPath]; ok {
+			g.Logger.Debugf("LocateGoPackages[1]: Located package for: %s\n", gpkg.Dir)
 			gop.Dir = gpkg.Dir
 			gop.ImportPath = gpkg.ImportPath
 			gop.Name = gpkg.Name
+		} else {
+			// g.Logger.Errorf("LocateGoPackages[2]: Could not locate package for: %s\n", gpkg.Dir)
 		}
 	}
 	return nil
@@ -403,12 +407,44 @@ func (g *GenesisVM) WalkGoPackageAST(gop *GoPackage, wg *sync.WaitGroup, errChan
 	ctxt := build.Default
 	ctxt.GOOS = g.OS
 	ctxt.GOARCH = g.Arch
+
+	// Hacky fix for resolving packages
+	g.Logger.Debugf("WalkGoPackageAST for %+v", gop)
+	_tmp := ""
+	if gop.ImportKey == "github.com/gen0cide/gscript/x/windows" {
+		_tmp = gop.Dir
+		gop.ImportKey = "./github.com/gen0cide/gscript/x/windows"
+		gop.Dir = "/go/src"
+	}
+	if gop.ImportKey == "github.com/gen0cide/gscript/stdlib/file" {
+		_tmp = gop.Dir
+		gop.ImportKey = "./github.com/gen0cide/gscript/stdlib/file"
+		gop.Dir = "/go/src"
+	}
+	g.Logger.Debugf("Calling ctxt.Import(%s, %s, %d)", gop.ImportKey, gop.Dir, build.ImportComment)
 	pkg, err := ctxt.Import(gop.ImportKey, gop.Dir, build.ImportComment)
 	if err != nil {
+		g.Logger.Errorf("Error when we called ctxt.Import(%s, %s, %d)", gop.ImportKey, gop.Dir, build.ImportComment)
+		g.Logger.Errorf("Error from WalkGoPackageAST[1]: %s", err.Error())
 		errChan <- err
 		wg.Done()
 		return
+	} else {
+		g.Logger.Debugf(`Sucess when we called ctxt.Import(%s, %s, %d)
+			pkg.Name:%s
+			pkg.Dir: %s
+			pkg.ImportComment: %s
+			pkg.SrcRoot: %s
+			pkg.PkgRoot: %s
+			pkg.ImportPath: %s`,
+			gop.ImportKey, gop.Dir, build.ImportComment, pkg.Name, pkg.Dir, pkg.ImportComment, pkg.SrcRoot, pkg.PkgRoot, pkg.ImportPath)
 	}
+
+	// Restore so work
+	if _tmp != "" {
+		gop.Dir = _tmp
+	}
+
 	// NOTE: maybe we want to include pkg.CgoFiles?
 	validSrcFiles := map[string]bool{}
 
@@ -426,6 +462,7 @@ func (g *GenesisVM) WalkGoPackageAST(gop *GoPackage, wg *sync.WaitGroup, errChan
 	gop.FileSet = token.NewFileSet()
 	pkgs, err := parser.ParseDir(gop.FileSet, gop.Dir, pkgFilter, parser.ParseComments)
 	if err != nil {
+		g.Logger.Debugf("Error from WalkGoPackageAST[2]: %s", err.Error())
 		errChan <- err
 		return
 	}
@@ -479,6 +516,7 @@ func (g *GenesisVM) SanityCheckNativeFunctionCalls() error {
 func (g *GenesisVM) BuildGolangAST() error {
 	var wg sync.WaitGroup
 	numOfPackages := len(g.GoPackageByImport) + len(g.EnabledStandardLibs)
+	g.Logger.Debugf("We have %d packages", numOfPackages)
 	errChan := make(chan error, 1)
 	finChan := make(chan bool, 1)
 
@@ -500,6 +538,7 @@ func (g *GenesisVM) BuildGolangAST() error {
 	case <-finChan:
 		return nil
 	case err := <-errChan:
+		g.Logger.Errorf("Error from BuildGolangAST[1]: %s", err.Error())
 		return err
 	}
 }
