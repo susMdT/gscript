@@ -1,4 +1,4 @@
-module github.com/gen0cide/gscript
+module github.com/susMdT/gscript
 
 require (
 	github.com/Jeffail/gabs v1.4.0
