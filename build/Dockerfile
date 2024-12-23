@@ -2,6 +2,7 @@ FROM golang:1.19.0-bullseye
 MAINTAINER Alex Levinson <alexl@uber.com>
 
 ENV GSCRIPT_REVISION master
+ENV GO111MODULE=auto
 ENV GARBLE_VERSION=v0.9.0
 ENV GOPATH='/root/go'
 ENV GOROOT='/usr/local/go'

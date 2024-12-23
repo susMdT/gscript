@@ -10,7 +10,6 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
-	"strings"
 	"sync"
 	"text/template"
 
@@ -407,20 +406,20 @@ func (g *GenesisVM) WalkGoPackageAST(gop *GoPackage, wg *sync.WaitGroup, errChan
 	ctxt.GOOS = g.OS
 	ctxt.GOARCH = g.Arch
 
-	_imp := gop.ImportKey
-	_dir := gop.Dir
-	home, err := os.UserHomeDir()
+	// _imp := gop.ImportKey
+	// _dir := gop.Dir
+	// home, err := os.UserHomeDir()
+	// if err != nil {
+	// 	// wtf
+	// }
+	// if strings.HasPrefix(gop.Dir, home+"/go/src/") {
+	// 	_imp = "./" + _imp
+	// 	_dir = home + "/go/src/"
+	// }
+	g.Logger.Debugf("Calling ctxt.Import(%s, %s, %d)", gop.ImportKey, gop.Dir, build.ImportComment)
+	pkg, err := ctxt.Import(gop.ImportKey, gop.Dir, build.ImportComment)
 	if err != nil {
-		// wtf
-	}
-	if strings.HasPrefix(gop.Dir, home+"/go/src/") {
-		_imp = "./" + _imp
-		_dir = home + "/go/src/"
-	}
-	g.Logger.Debugf("Calling ctxt.Import(%s, %s, %d)", _imp, _dir, build.ImportComment)
-	pkg, err := ctxt.Import(_imp, _dir, build.ImportComment)
-	if err != nil {
-		g.Logger.Errorf("Error when we called ctxt.Import(%s, %s, %d)", _imp, _dir, build.ImportComment)
+		g.Logger.Errorf("Error when we called ctxt.Import(%s, %s, %d)", gop.ImportKey, gop.Dir, build.ImportComment)
 		g.Logger.Errorf("Error from WalkGoPackageAST[1]: %s", err.Error())
 		errChan <- err
 		wg.Done()
@@ -433,7 +432,7 @@ func (g *GenesisVM) WalkGoPackageAST(gop *GoPackage, wg *sync.WaitGroup, errChan
 			pkg.SrcRoot: %s
 			pkg.PkgRoot: %s
 			pkg.ImportPath: %s`,
-			_imp, _dir, build.ImportComment, pkg.Name, pkg.Dir, pkg.ImportComment, pkg.SrcRoot, pkg.PkgRoot, pkg.ImportPath)
+			gop.ImportKey, gop.Dir, build.ImportComment, pkg.Name, pkg.Dir, pkg.ImportComment, pkg.SrcRoot, pkg.PkgRoot, pkg.ImportPath)
 	}
 
 	// NOTE: maybe we want to include pkg.CgoFiles?
