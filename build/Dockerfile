@@ -2,6 +2,7 @@ FROM golang:1.19.0-bullseye
 MAINTAINER Alex Levinson <alexl@uber.com>
 
 ENV GSCRIPT_REVISION master
+ENV GARBLE_VERSION=v0.10.0
 ENV GOPATH='/root/go'
 ENV GOROOT='/usr/local/go'
 
@@ -27,6 +28,8 @@ RUN DEBIAN_FRONTEND=noninteractive \
     locale-gen en_US en_US.UTF-8 && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
+
+RUN go install mvdan.cc/garble@${GARBLE_VERSION}
 
 ADD ps1.sh /etc/profile.d/Z1_PS1.sh
 

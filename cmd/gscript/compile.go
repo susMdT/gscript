@@ -104,6 +104,11 @@ var (
 				Usage:       "Import path with the gscript stdlib. Basically, a dir in ~/go or $GOPATH where the repo is. eg: gen0cide/gscript/",
 				Destination: &defaultCompileOptions.ImportPath,
 			},
+			&cli.BoolFlag{
+				Name:        "enable-garble",
+				Usage:       "enable using the garble compiler instead of the standard golang compiler.",
+				Destination: &defaultCompileOptions.EnableGarble,
+			},
 		},
 		Action: compileScriptCommand,
 	}
@@ -172,6 +177,7 @@ func compileScriptCommand(c *cli.Context) error {
 	cliLogger.Infof(copt("Skip Compilation", defaultCompileOptions.SkipCompilation))
 	cliLogger.Infof(copt("Obfuscation Level", defaultCompileOptions.ObfuscationLevel))
 	cliLogger.Infof(copt("Import Path", defaultCompileOptions.ImportPath))
+	cliLogger.Infof(copt("Use Garble Compiler", defaultCompileOptions.EnableGarble))
 	cliLogger.Info("")
 	cliLogger.Info(color.HiRedString("***  SOURCE SCRIPTS  ***"))
 	cliLogger.Info("")

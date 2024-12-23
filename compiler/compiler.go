@@ -523,9 +523,17 @@ func (c *Compiler) BuildNativeBinary() error {
 	}
 	var cmd *exec.Cmd
 	if c.WindowsGui {
-		cmd = exec.Command("go", "build", `-ldflags`, `-H=windowsgui -s`, "-o", c.OutputFile, c.BuildArgs)
+		if c.EnableGarble {
+			cmd = exec.Command("garble", c.BuildArgs, "build", `-buildvcs=false`, `-ldflags`, `-s -w`, "-o", c.OutputFile)
+		} else {
+			cmd = exec.Command("go", "build", `-ldflags`, `-H=windowsgui -s`, "-o", c.OutputFile, c.BuildArgs)
+		}
 	} else {
-		cmd = exec.Command("go", "build", `-ldflags`, `-s`, "-o", c.OutputFile, c.BuildArgs)
+		if c.EnableGarble {
+			cmd = exec.Command("garble", c.BuildArgs, "build", `-buildvcs=false`, `-ldflags`, `-s -w`, "-o", c.OutputFile)
+		} else {
+			cmd = exec.Command("go", "build", `-ldflags`, `-s`, "-o", c.OutputFile, c.BuildArgs)
+		}
 	}
 	cmd.Env = os.Environ()
 	cmd.Env = append(cmd.Env, fmt.Sprintf("GOOS=%s", c.OS))

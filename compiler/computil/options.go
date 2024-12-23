@@ -103,6 +103,10 @@ type Options struct {
 	EnableTestBuild bool `json:"enable_test_build,omitempty"`
 
 	ImportPath string `json:import_path,omitempty"`
+
+	// Tell the compiler to use garble instead of just go
+	// DEFAULT: go
+	EnableGarble bool `json:"enable_garble"`
 }
 
 // ValidOSList returns the list of valid target operating systems
@@ -184,6 +188,7 @@ func DefaultOptions() Options {
 		ForceUseMordorifier:   false,
 		ObfuscationLevel:      FullObfuscation,
 		ImportPath:            "",
+		EnableGarble:          false,
 	}
 }
 
